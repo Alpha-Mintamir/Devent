@@ -40,12 +40,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     logger.info(f"User {user.id} ({user.first_name}) started the bot")
     
-    # Create static keyboard with Post Vent and Help buttons
+    # Create inline keyboard
     keyboard = [
-        [KeyboardButton("📝 Post a Vent")],
-        [KeyboardButton("❓ Help")]
+        [InlineKeyboardButton("📝 Post a Vent", callback_data="start_post")],
+        [InlineKeyboardButton("❓ Help", callback_data="start_help")]
     ]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    reply_markup = InlineKeyboardMarkup(keyboard)
     
     await update.message.reply_text(
         "👋 Welcome to Devent!\n\n"
@@ -166,13 +166,6 @@ async def show_topic_selection(message, selected_topics=None):
     return SELECTING_TOPIC
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text
-    
-    if text == "📝 Post a Vent":
-        return await show_dev_type_selection(update.message)
-    elif text == "❓ Help":
-        return await help_command(update, context)
-    
     # Handle message input during conversation
     if 'dev_types' not in context.user_data:
         return await show_dev_type_selection(update.message)
@@ -202,6 +195,21 @@ async def handle_choice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     
     try:
+        if query.data == "start_post":
+            return await show_dev_type_selection(query.message)
+        elif query.data == "start_help":
+            help_text = (
+                "🤖 *Devent Bot Help*\n\n"
+                "To post a vent:\n"
+                "1. Select your developer type\n"
+                "2. Select a topic for your vent\n"
+                "3. Type your message\n"
+                "4. Choose to post anonymously or with your name\n\n"
+                "Your message will be shared in our community channel!"
+            )
+            await query.message.edit_text(help_text, parse_mode='Markdown')
+            return ConversationHandler.END
+        
         if query.data.startswith("devtype_"):
             dev_type = query.data.replace("devtype_", "")
             if dev_type == "next":
