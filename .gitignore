@@ -1,7 +1,7 @@
 # Virtual environments
 venv/
 env/
-.env/
+.env
 .venv/
 
 # Logs
