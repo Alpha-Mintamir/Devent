@@ -40,7 +40,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     logger.info(f"User {user.id} ({user.first_name}) started the bot")
     
-    # Create inline keyboard
     keyboard = [
         [InlineKeyboardButton("📝 Post a Vent", callback_data="start_post")],
         [InlineKeyboardButton("❓ Help", callback_data="start_help")]
@@ -51,8 +50,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "👋 Welcome to Devent!\n\n"
         "I'm here to help developers share their thoughts, frustrations, and celebrations "
         "with the community.\n\n"
+        "*Join our channel:*\n"
+        "[@dev_vent](https://t.me/dev_vent)\n\n"
         "What would you like to do?",
-        reply_markup=reply_markup
+        reply_markup=reply_markup,
+        parse_mode='Markdown',
+        disable_web_page_preview=True
     )
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -290,7 +293,26 @@ async def handle_choice(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         
         logger.info(f"Successfully posted message to channel for user {user.id}")
-        await query.edit_message_text("✅ Your message has been posted to the channel!")
+        
+        # Create inline keyboard for posting again
+        keyboard = [
+            [InlineKeyboardButton("📝 Post Another Vent", callback_data="start_post")],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        success_message = (
+            "✅ Your message has been posted!\n\n"
+            "*Join our channel to see your post:*\n"
+            "[@dev_vent](https://t.me/dev_vent)\n\n"
+            "Want to share another thought? Click below 👇"
+        )
+        
+        await query.edit_message_text(
+            text=success_message,
+            reply_markup=reply_markup,
+            parse_mode='Markdown',
+            disable_web_page_preview=True
+        )
         
         # Clear user data
         context.user_data.clear()
