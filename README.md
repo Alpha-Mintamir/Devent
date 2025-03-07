@@ -154,4 +154,4 @@ If you have any questions or need help, feel free to:
 - All contributors and users of the bot
 
 ---
-Made with ❤️ by Alpha-mintamir
+Made with ❤️ by Alpha-mintamir & Kenawak Ibsa
